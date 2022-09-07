@@ -37,6 +37,40 @@ void readInputFile(istream& input, Vector<string> v, Map<string, Vector<string> 
     cout << endl;
     v = stringSplit(text, "\n");
     cout << v << endl;
+
+    // Put the text into a map data structure
+    // Examples
+    // NOUN::=dog|cat|girl|store|second cousin|great grandpa|child|television|homework|Java program
+    // VERBP::=TVERB NOUNP|IVERB
+    // tempV
+    // {"NOUN", "dog|cat|girl|store|second cousin|great grandpa|child|television|homework|Java program}
+    // {"VERB", "TVERB NOUNP|IVERB"}
+    // tempV[0] >>> "VERB"
+    // tempV[1] >>> "TVERB NOUNP|IVERB"
+    // tempVPipe >>> {"TVERB NOUNP", "IVERB}
+    // tempV3Space >> {"TVERB", "NOUNP"}
+    // value >>> {{"TVERB", "NOUNP"}, "IVERB}
+
+    Vector<string> tempV;
+    Vector<Vector<string> > valueVec;
+    for (int i = 0; i < v.size(); i++)
+        tempV = stringSplit(v[i], ":=");
+        string key = tempV[0];
+        string value = tempV[1];
+        // Check for multiple rules separated by "|"
+        if (stringContains(value, "|")){
+            valueVec.add(stringSplit(value, "|"));
+            // Check for multiple tokens separated by " "
+            for (int j = 0; j < valueVec.size(); j++) {
+                if (stringContains(valueVec[i][j], " ")) {
+                    valueVec.set(j, stringSplit(value, " "));
+                }
+            }
+        }
+        valueVec.add(value);
+        map.put(key, valueVec);
+        valueVec.clear();
+        }
     // extract key and extract values for a map
     // if values have no white space, put into vector of strings
     // if values have space, put into nested vector (vector inside a vector
