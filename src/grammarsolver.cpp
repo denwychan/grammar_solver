@@ -27,7 +27,9 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
     readInputFile(input, map);
 
     // generate elements randomly generate elements of the grammar (recursively)
-    generateRandomElements(map, symbol, "");
+    string results = generateRandomElements(map, symbol, "");
+
+    cout << results << endl;
     
     // Use trim to get rid of white space
 
@@ -85,7 +87,7 @@ string generateRandomElements(
     // If the symbol is a terminal
     // If the symbol is empty "", throw string exception
     if (!map.containsKey(symbol)){
-//        results = results + " " + symbol;
+        results = results + " " + symbol;
 //        cout << trim(results) << endl;
         return trim(results);
     } else if (symbol == ""){
@@ -94,11 +96,11 @@ string generateRandomElements(
     // Recursive
         Vector<Vector<string> > rules = map.get(symbol);
         Vector<string> subRules = rules[randomInteger(0, rules.size() - 1)];
-        symbol = subRules[randomInteger(0, subRules.size() - 1)];
-        results = results + " " + symbol;
-        cout << symbol << endl;
-        cout << results << endl;
-        generateRandomElements(map, symbol, results);
+        for (int i = 0; i < subRules.size() ; i++){
+//            cout << subRules[i] << endl;
+            results = results + " " + generateRandomElements(map, subRules[i], results);
+//            cout << results << endl;
+        }
         return trim(results);
     }
 }
