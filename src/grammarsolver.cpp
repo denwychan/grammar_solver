@@ -10,7 +10,8 @@
 using namespace std;
 
 // Function prototypes
-void readInputFile(istream& input, Vector<string> v, Map<string, Vector<Vector<string> > >& map);
+void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<string> > >& map);
+void splitByDelimiter(string text, Vector<string>& v, string delimiter);
 
 Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
@@ -30,13 +31,12 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
     return v;           // this is only here so it will compile
 }
 
-void readInputFile(istream& input, Vector<string> v, Map<string, Vector<Vector<string> > >& map){
+void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<string> > >& map){
     // Open text from reading the input stream
     string text = readEntireStream(input);
-    cout << text << endl;
-    cout << endl;
+
     v = stringSplit(text, "\n");
-//    cout << v << endl;
+    cout << v << endl;
 
     // Put the text into a map data structure
     // Examples
@@ -52,52 +52,30 @@ void readInputFile(istream& input, Vector<string> v, Map<string, Vector<Vector<s
     // value >>> {{"TVERB", "NOUNP"}, "IVERB}
 
 
-    Vector<Vector<string> > value;
     for (int i = 0; i < v.size(); i++){
-        Vector<string> tempV;
-        tempV = stringSplit(v[i], "::=");
+        Vector<Vector<string> > value;
+
+        Vector<string> tempV = stringSplit(v[i], "::=");
         string key = tempV[0]; // e.g. tempV[0] >>> "VERB"
         string valueString = tempV[1]; // e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
+
         // Check for multiple rules separated by "|"
-        if (stringContains(valueString, "|")){
-            Vector<string> tempVPipe;
-            tempVPipe = (stringSplit(valueString, "|")); // {"TVERB NOUNP", "IVERB}
-            // Check for multiple tokens separated by " "
-            for (int j = 0; j < tempVPipe.size(); j++) {
-                if (stringContains(tempVPipe[j], " ")) {
-                    Vector<string> tempVSpace;
-                    tempVSpace = stringSplit(tempVPipe[j], " ");
-                    value.add(tempVSpace);
-                } else {
-                    value.add(tempVPipe);
-//                    map.put(key, value);
-                }
-            }
-        } else {
-            Vector<string> tempVTerminal;
-            tempVTerminal.add(valueString);
-            value.add(tempVTerminal);
-//            map.put(key, value);
+        // If there are spaces <dp> <adjp> <n> >>> {<dp>, <adjp>, <n>}
+        // If there are no spaces <pn> <<< {<pn>}
+
+        Vector<string> tempVPipe = stringSplit(valueString, "|");
+        for (int j = 0; j < tempVPipe.size(); j++) {
+            Vector<string> tempVSpace = stringSplit(tempVPipe[j], " ");
+            value.add(tempVSpace);
         }
         map.put(key, value);
     }
 
-    cout << map.keys() << endl;
-    cout << endl;
-    cout << map.keys()[0] << endl;
-    cout << endl;
-    cout << map.get(map.keys()[0]) << endl;
-    cout << endl;
-    cout << map.get(map.keys()[1]) << endl;
-    cout << endl;
-    cout << map << endl;
-
-    // extract key and extract values for a map
-    // if values have no white space, put into vector of strings
-    // if values have space, put into nested vector (vector inside a vector
-    // of strings
-
-    // stringSplit
-    // Vector<string> stringSplit(string s, string delimiter)
-
+//    cout << map.keys() << endl;
+//    for (int i = 0; i < map.keys().size(); i++ ){
+//        string mapKey = map.keys()[i];
+//        cout << mapKey << endl;
+//        cout << map.get(mapKey) << endl;
+//        cout << endl;
+    }
 }
