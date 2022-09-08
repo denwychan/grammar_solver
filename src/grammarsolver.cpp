@@ -20,7 +20,6 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
     // readInputFile() read an input file with a grammar in Backus-Naur Form
     // and turns its contents into a data structure
-
     readInputFile(input, v, map);
 
     // generate elements randomly generate elements of the grammar (recursively)
@@ -32,50 +31,42 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 }
 
 void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<string> > >& map){
-    // Open text from reading the input stream
+    // Open text from reading the input stream and split text into a vector of lines
     string text = readEntireStream(input);
-
     v = stringSplit(text, "\n");
-    cout << v << endl;
+
+    // TEST
+    //    cout << v << endl;
 
     // Put the text into a map data structure
-    // Examples
-    // NOUN::=dog|cat|girl|store|second cousin|great grandpa|child|television|homework|Java program
-    // VERBP::=TVERB NOUNP|IVERB
-    // tempV
-    // {"NOUN", "dog|cat|girl|store|second cousin|great grandpa|child|television|homework|Java program}
-    // {"VERB", "TVERB NOUNP|IVERB"}
-    // tempV[0] >>> "VERB"
-    // tempV[1] >>> "TVERB NOUNP|IVERB"
-    // tempVPipe >>> {"TVERB NOUNP", "IVERB}
-    // tempVSpace >> {"TVERB", "NOUNP"}
-    // value >>> {{"TVERB", "NOUNP"}, "IVERB}
-
-
     for (int i = 0; i < v.size(); i++){
+        // Instantiate a vector of vector of strings to go into map
         Vector<Vector<string> > value;
 
+        // Split into key and value by "::=" e.g. {"VERB", "TVERB NOUNP|IVERB"}
         Vector<string> tempV = stringSplit(v[i], "::=");
         string key = tempV[0]; // e.g. tempV[0] >>> "VERB"
         string valueString = tempV[1]; // e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
 
-        // Check for multiple rules separated by "|"
         // If there are spaces <dp> <adjp> <n> >>> {<dp>, <adjp>, <n>}
         // If there are no spaces <pn> <<< {<pn>}
-
+        // Split by rules as separated by "|" e.g. "TVERB NOUNP|IVERB" >>> {"TVERB NOUNP", IVERB"}
         Vector<string> tempVPipe = stringSplit(valueString, "|");
         for (int j = 0; j < tempVPipe.size(); j++) {
+            // Split by space e.g. "TVERB NOUNP" >>> {"TVERB", "NOUNP"}
             Vector<string> tempVSpace = stringSplit(tempVPipe[j], " ");
             value.add(tempVSpace);
         }
+
+        // Add final key and vector and vectors to map
         map.put(key, value);
     }
 
+    //TEST
 //    cout << map.keys() << endl;
 //    for (int i = 0; i < map.keys().size(); i++ ){
 //        string mapKey = map.keys()[i];
 //        cout << mapKey << endl;
 //        cout << map.get(mapKey) << endl;
 //        cout << endl;
-    }
 }
