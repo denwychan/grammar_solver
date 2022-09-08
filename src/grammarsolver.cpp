@@ -1,5 +1,12 @@
-// This is the CPP file you will edit and turn in. (TODO: Remove this comment!)
+/*
+ * This is an implementation of a random grammar elements generater according to formalised rules
+ * described in Backus-Naur Form (BNF). The program prompts the user to open a text file
+ * by its file name, and convert the content to a map if it is in valid BNF. This is used
+ * to randomly generate elements (words or phrases) according to the key of the BNF and frequency
+ * inputted by the user
+ */
 
+// Imports
 #include <iostream>
 
 #include "grammarsolver.h"
@@ -18,85 +25,70 @@ string generateRandomElements(
         Map<string, Vector<Vector<string> > >& map, string symbol);
 
 Vector<string> grammarGenerate(istream& input, string symbol, int times) {
-
+    // Initialising a vector for the final output
     Vector<string> v;
+    // Initialising the map for the symbol and rules
     Map<string, Vector<Vector<string> > > map;
 
-    // readInputFile() read an input file with a grammar in Backus-Naur Form
-    // and turns its contents into a data structure
+    // Read an input file with grammar in Backus-Naur Form and turns the contents into a map
     readInputFile(input, map);
 
-    // generate elements randomly generate elements of the grammar (recursively)
-
+    // Generate elements of the grammar randomly according to the number of time specified by the
+    // user
     for (int i = 0; i < times; i ++){
         string results = generateRandomElements(map, symbol);
         v.add(results);
     }
-
-    cout << v << endl;
-    // Use trim to get rid of white space
-    return v;           // this is only here so it will compile
+    // Return the results as a vector
+    return v;
 }
 
+// Read input file and turn its contents into a map
 void readInputFile(istream& input, Map<string, Vector<Vector<string> > >& map){
     // Open text from reading the input stream and split text into a vector of lines
     string text = readEntireStream(input);
     Vector<string> v = stringSplit(text, "\n");
 
-    // TEST
-    //    cout << v << endl;
-
-    // Put the text into a map data structure
+    // Put each line into a map data structure
     for (int i = 0; i < v.size(); i++){
-        // Instantiate a vector of vector of strings to go into map
+        // Instantiate a vector of vector of strings to go into the map as the value
         Vector<Vector<string> > value;
-
         // Split into key and value by "::=" e.g. {"VERB", "TVERB NOUNP|IVERB"}
         Vector<string> tempV = stringSplit(v[i], "::=");
-        string key = tempV[0]; // e.g. tempV[0] >>> "VERB"
+        string key = tempV[0]; // This is the key e.g. tempV[0] >>> "VERB"
+        // If the key is duplicated in the content, then throw an error
         if (map.containsKey(key)){
             error("Grammar cannot contain multiple lines of rules for the same non-terminal");
         }
-        string valueString = tempV[1]; // e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
-
-        // If there are spaces <dp> <adjp> <n> >>> {<dp>, <adjp>, <n>}
-        // If there are no spaces <pn> <<< {<pn>}
-        // Split by rules as separated by "|" e.g. "TVERB NOUNP|IVERB" >>> {"TVERB NOUNP", IVERB"}
+        string valueString = tempV[1]; // This is the value e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
+        // Split up rules as separated by "|" e.g. "TVERB NOUNP|IVERB" >>> {"TVERB NOUNP", IVERB"}
         Vector<string> tempVPipe = stringSplit(valueString, "|");
         for (int j = 0; j < tempVPipe.size(); j++) {
             // Split by space e.g. "TVERB NOUNP" >>> {"TVERB", "NOUNP"}
             Vector<string> tempVSpace = stringSplit(tempVPipe[j], " ");
             value.add(tempVSpace);
         }
-
         // Add final key and vector and vectors to map
         map.put(key, value);
     }
-
-    //TEST
-//    cout << map.keys() << endl;
-//    for (int i = 0; i < map.keys().size(); i++ ){
-//        string mapKey = map.keys()[i];
-//        cout << mapKey << endl;
-//        cout << map.get(mapKey) << endl;
-//        cout << endl;
 }
 
 string generateRandomElements(Map<string, Vector<Vector<string> > >& map, string symbol){
-    // Base case
-    // If the symbol is a terminal
-    // If the symbol is empty "", throw string exception
     string results = "";
-    if (!map.containsKey(symbol)){
+    if (!map.containsKey(symbol)){ // Base case: if the symbol is a terminal, return the symbol
+        // as it is
         return trim(symbol);
-    } else if (symbol == ""){
+    } else if (symbol == ""){ // Base case: if the symbol is empty "", throw string exception
         error("Symbol cannot be empty!");
-    } else { // Recursive
+        return symbol;
+    } else { // Recursive case: look up the symobol for the grammar rules to generate the results
         Vector<Vector<string> > rules = map.get(symbol);
         Vector<string> subRules = rules[randomInteger(0, rules.size() - 1)];
+        // Generate random elements for each sub-rule
         for (int i = 0; i < subRules.size() ; i++){
             results = results + " " + generateRandomElements(map, subRules[i]);
         }
+        // Clean up the results
         return trim(results);
     }
 }
