@@ -7,11 +7,15 @@
 #include "map.h"
 #include "vector.h"
 #include "filelib.h"
+#include "error.h"
+#include "random.h"
 using namespace std;
 
 // Function prototypes
-void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<string> > >& map);
+void readInputFile(istream& input, Map<string, Vector<Vector<string> > >& map);
 void splitByDelimiter(string text, Vector<string>& v, string delimiter);
+string generateRandomElements(
+        Map<string, Vector<Vector<string> > >& map, string symbol, string results);
 
 Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
@@ -20,9 +24,10 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
     // readInputFile() read an input file with a grammar in Backus-Naur Form
     // and turns its contents into a data structure
-    readInputFile(input, v, map);
+    readInputFile(input, map);
 
     // generate elements randomly generate elements of the grammar (recursively)
+    generateRandomElements(map, symbol, "");
     
     // Use trim to get rid of white space
 
@@ -30,10 +35,10 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
     return v;           // this is only here so it will compile
 }
 
-void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<string> > >& map){
+void readInputFile(istream& input, Map<string, Vector<Vector<string> > >& map){
     // Open text from reading the input stream and split text into a vector of lines
     string text = readEntireStream(input);
-    v = stringSplit(text, "\n");
+    Vector<string> v = stringSplit(text, "\n");
 
     // TEST
     //    cout << v << endl;
@@ -46,6 +51,9 @@ void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<
         // Split into key and value by "::=" e.g. {"VERB", "TVERB NOUNP|IVERB"}
         Vector<string> tempV = stringSplit(v[i], "::=");
         string key = tempV[0]; // e.g. tempV[0] >>> "VERB"
+        if (map.containsKey(key)){
+            error("Grammar cannot contain multiple lines of rules for the same non-terminal");
+        }
         string valueString = tempV[1]; // e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
 
         // If there are spaces <dp> <adjp> <n> >>> {<dp>, <adjp>, <n>}
@@ -69,4 +77,28 @@ void readInputFile(istream& input, Vector<string>& v, Map<string, Vector<Vector<
 //        cout << mapKey << endl;
 //        cout << map.get(mapKey) << endl;
 //        cout << endl;
+}
+
+string generateRandomElements(
+        Map<string, Vector<Vector<string> > >& map, string symbol, string results){
+    // Base case
+    // If the symbol is a terminal
+    // If the symbol is empty "", throw string exception
+    if (!map.containsKey(symbol)){
+//        results = results + " " + symbol;
+//        cout << trim(results) << endl;
+        return trim(results);
+    } else if (symbol == ""){
+        error("Symbol cannot be empty!");
+    } else {
+    // Recursive
+        Vector<Vector<string> > rules = map.get(symbol);
+        Vector<string> subRules = rules[randomInteger(0, rules.size() - 1)];
+        symbol = subRules[randomInteger(0, subRules.size() - 1)];
+        results = results + " " + symbol;
+        cout << symbol << endl;
+        cout << results << endl;
+        generateRandomElements(map, symbol, results);
+        return trim(results);
+    }
 }
