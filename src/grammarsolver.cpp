@@ -10,12 +10,12 @@
 using namespace std;
 
 // Function prototypes
-void readInputFile(istream& input, Vector<string> v, Map<string, Vector<string> >& map);
+void readInputFile(istream& input, Vector<string> v, Map<string, Vector<Vector<string> > >& map);
 
 Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
     Vector<string> v;
-    Map<string, Vector<string> > map;
+    Map<string, Vector<Vector<string> > > map;
 
     // readInputFile() read an input file with a grammar in Backus-Naur Form
     // and turns its contents into a data structure
@@ -30,13 +30,13 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
     return v;           // this is only here so it will compile
 }
 
-void readInputFile(istream& input, Vector<string> v, Map<string, Vector<string> >& map){
+void readInputFile(istream& input, Vector<string> v, Map<string, Vector<Vector<string> > >& map){
     // Open text from reading the input stream
     string text = readEntireStream(input);
     cout << text << endl;
     cout << endl;
     v = stringSplit(text, "\n");
-    cout << v << endl;
+//    cout << v << endl;
 
     // Put the text into a map data structure
     // Examples
@@ -48,29 +48,50 @@ void readInputFile(istream& input, Vector<string> v, Map<string, Vector<string> 
     // tempV[0] >>> "VERB"
     // tempV[1] >>> "TVERB NOUNP|IVERB"
     // tempVPipe >>> {"TVERB NOUNP", "IVERB}
-    // tempV3Space >> {"TVERB", "NOUNP"}
+    // tempVSpace >> {"TVERB", "NOUNP"}
     // value >>> {{"TVERB", "NOUNP"}, "IVERB}
 
-    Vector<string> tempV;
-    Vector<Vector<string> > valueVec;
-    for (int i = 0; i < v.size(); i++)
-        tempV = stringSplit(v[i], ":=");
-        string key = tempV[0];
-        string value = tempV[1];
+
+    Vector<Vector<string> > value;
+    for (int i = 0; i < v.size(); i++){
+        Vector<string> tempV;
+        tempV = stringSplit(v[i], "::=");
+        string key = tempV[0]; // e.g. tempV[0] >>> "VERB"
+        string valueString = tempV[1]; // e.g. tempV[1] >>> "TVERB NOUNP|IVERB"
         // Check for multiple rules separated by "|"
-        if (stringContains(value, "|")){
-            valueVec.add(stringSplit(value, "|"));
+        if (stringContains(valueString, "|")){
+            Vector<string> tempVPipe;
+            tempVPipe = (stringSplit(valueString, "|")); // {"TVERB NOUNP", "IVERB}
             // Check for multiple tokens separated by " "
-            for (int j = 0; j < valueVec.size(); j++) {
-                if (stringContains(valueVec[i][j], " ")) {
-                    valueVec.set(j, stringSplit(value, " "));
+            for (int j = 0; j < tempVPipe.size(); j++) {
+                if (stringContains(tempVPipe[j], " ")) {
+                    Vector<string> tempVSpace;
+                    tempVSpace = stringSplit(tempVPipe[j], " ");
+                    value.add(tempVSpace);
+                } else {
+                    value.add(tempVPipe);
+//                    map.put(key, value);
                 }
             }
+        } else {
+            Vector<string> tempVTerminal;
+            tempVTerminal.add(valueString);
+            value.add(tempVTerminal);
+//            map.put(key, value);
         }
-        valueVec.add(value);
-        map.put(key, valueVec);
-        valueVec.clear();
-        }
+        map.put(key, value);
+    }
+
+    cout << map.keys() << endl;
+    cout << endl;
+    cout << map.keys()[0] << endl;
+    cout << endl;
+    cout << map.get(map.keys()[0]) << endl;
+    cout << endl;
+    cout << map.get(map.keys()[1]) << endl;
+    cout << endl;
+    cout << map << endl;
+
     // extract key and extract values for a map
     // if values have no white space, put into vector of strings
     // if values have space, put into nested vector (vector inside a vector
