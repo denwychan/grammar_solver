@@ -1,8 +1,8 @@
 ADJEC::=hot|bad|platinum|crazy|curvy|wavy|sweet|little|savage|classy|stupid|sassy|nasty
-PNOUN::=Megan|Becky|Mona Lisa|Beyonce|Cardi B|Big D|WAP|Big Mack Truck|Carole Baskins|Lil Ju|Chan|Stallion|Versace|Insta'|Megan from Texas|Gucci|Capri Sun|Creole|Tina Snow|Stormy Daniels|Hennessy|Mia Khalifa
+PNOUN::=Megan|Becky|Mona Lisa|Beyonce|Cardi B|Big D|WAP|Carole Baskins|Lil Ju|Chan|Stallion|Versace|Insta'|Megan from Texas|Gucci|Capri Sun|Creole|Tina Snow|Stormy Daniels|Hennessy|Mia Khalifa
 TVERB::=licked|mopped|rode|ate|kissed|wanted|asked|took|popped|played
 DET::=the|a
-NOUN::=face|bootie|[motherlover]|ass|game|copy cat|corporation|pimp|[female pup]|[kitty]|[lady of the night]|shoes|tongue|face|clit|[gentleman vegetables]|ghetto|cello|opinion|hot girl shit|money
+NOUN::=face|bootie|[motherlover]|ass|game|copy cat|corporation|pimp|[female pup]|[kitty]|[lady of the night]|shoes|tongue|face|clit|[gentleman aubergine]|ghetto|cello|opinion|hot girl shit|money
 VERBP::=TVERB NOUNP|IVERB
 SENT::=NOUNP VERBP
 ADJP::=ADJEC|ADJEC ADJP
