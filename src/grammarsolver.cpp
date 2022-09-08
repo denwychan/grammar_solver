@@ -15,7 +15,7 @@ using namespace std;
 void readInputFile(istream& input, Map<string, Vector<Vector<string> > >& map);
 void splitByDelimiter(string text, Vector<string>& v, string delimiter);
 string generateRandomElements(
-        Map<string, Vector<Vector<string> > >& map, string symbol, string results);
+        Map<string, Vector<Vector<string> > >& map, string symbol);
 
 Vector<string> grammarGenerate(istream& input, string symbol, int times) {
 
@@ -27,13 +27,14 @@ Vector<string> grammarGenerate(istream& input, string symbol, int times) {
     readInputFile(input, map);
 
     // generate elements randomly generate elements of the grammar (recursively)
-    string results = generateRandomElements(map, symbol, "");
 
-    cout << results << endl;
-    
+    for (int i = 0; i < times; i ++){
+        string results = generateRandomElements(map, symbol);
+        v.add(results);
+    }
+
+    cout << v << endl;
     // Use trim to get rid of white space
-
-
     return v;           // this is only here so it will compile
 }
 
@@ -81,25 +82,20 @@ void readInputFile(istream& input, Map<string, Vector<Vector<string> > >& map){
 //        cout << endl;
 }
 
-string generateRandomElements(
-        Map<string, Vector<Vector<string> > >& map, string symbol, string results){
+string generateRandomElements(Map<string, Vector<Vector<string> > >& map, string symbol){
     // Base case
     // If the symbol is a terminal
     // If the symbol is empty "", throw string exception
+    string results = "";
     if (!map.containsKey(symbol)){
-        results = results + " " + symbol;
-//        cout << trim(results) << endl;
-        return trim(results);
+        return trim(symbol);
     } else if (symbol == ""){
         error("Symbol cannot be empty!");
-    } else {
-    // Recursive
+    } else { // Recursive
         Vector<Vector<string> > rules = map.get(symbol);
         Vector<string> subRules = rules[randomInteger(0, rules.size() - 1)];
         for (int i = 0; i < subRules.size() ; i++){
-//            cout << subRules[i] << endl;
-            results = results + " " + generateRandomElements(map, subRules[i], results);
-//            cout << results << endl;
+            results = results + " " + generateRandomElements(map, subRules[i]);
         }
         return trim(results);
     }
